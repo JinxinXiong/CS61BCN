@@ -1,115 +1,109 @@
-public class LinkedListDeque <T> {
-    private class TNode {
+public class LinkedListDeque<T> {
+    private class ListNode{
         public T item;
-        public TNode prev;
-        public TNode next;
-        public TNode(T x, TNode p, TNode n) {
-            item = x;
-            prev = p;
-            next = n;
+        public ListNode prev;
+        public ListNode next;
+
+        public ListNode (T i) {
+            item = i;
+            prev = null;
+            next = null;
         }
     }
 
-    private TNode sentinel;
-    private int size;
+    private int size = 0;
+    private ListNode sentFront;
+    private ListNode sentBack;
 
-    public LinkedListDeque () {
-        sentinel = new TNode((T)"null", null, null);
-        sentinel.next = sentinel;
-        sentinel.prev = sentinel;
-        size = 0;
+    public LinkedListDeque() {
+        sentFront = new ListNode(null);
+        sentBack = new ListNode(null);
+        sentFront.next = sentBack;
+        sentBack.prev = sentFront;
     }
 
-    public LinkedListDeque(T item) {
-        sentinel = new TNode((T)"null", null, null);
-        sentinel.next = new TNode(item, sentinel, sentinel);
-        sentinel.prev = sentinel.next;
-        size = 1;
+    /** Add a node with value x to the end of the list**/
+    public void addFirst(T item) {
+        ListNode newNode = new ListNode(item);
+        ListNode first = sentFront.next;
+        newNode.next = first;
+        newNode.prev = sentFront;
+        first.prev = newNode;
+        sentFront.next = newNode;
+        size += 1;
+
+    }
+    public void addLast(T item) {
+        ListNode newNode = new ListNode(item);
+        ListNode secondLast = sentBack.prev;
+        newNode.prev = secondLast;
+        newNode.next = sentBack;
+        secondLast.next = newNode;
+        sentBack.prev = newNode;
+        size += 1;
     }
 
     public int size() {
         return size;
     }
-
-    public void addFirst(T item) {
-        sentinel.next = new TNode(item, sentinel, sentinel.next);
-        sentinel.next.next.prev = sentinel.next;
-        size += 1;
-    }
-
-    public void addLast(T item) {
-        sentinel.prev = new TNode(item, sentinel.prev, sentinel);
-        sentinel.prev.prev.next = sentinel.prev;
-        size += 1;
-    }
-
     public boolean isEmpty() {
-        if (0 == size) {
-            return true;
-        }
-        return false;
+        return size == 0;
     }
 
     public void printDeque() {
-        TNode ptr = sentinel;
-        while (ptr.next != sentinel) {
-            ptr = ptr.next;
-            System.out.print(ptr.item);
-            System.out.print(" ");
+        ListNode p = sentFront.next;
+
+        while (p != sentBack) {
+            System.out.print(p.item);
+            System.out.print(' ');
+            p = p.next;
         }
         System.out.println();
-
     }
 
     public T removeFirst() {
-        if (0 == size) {
+        if (size == 0){
             return null;
         }
+
+        ListNode first = sentFront.next;
+
+        sentFront.next = first.next;
+        first.next.prev = sentFront;
         size -= 1;
-        T res = sentinel.next.item;
-        sentinel.next = sentinel.next.next;
-        sentinel.next.prev = sentinel;
-        return res;
+
+        return first.item;
     }
 
     public T removeLast() {
-        if (0 == size) {
+        if (size == 0){
             return null;
         }
+
+        ListNode last = sentBack.prev;
+
+        sentBack.prev = last.prev;
+        last.prev.next = sentBack;
         size -= 1;
-        T res = sentinel.prev.item;
-        sentinel.prev.prev.next = sentinel;
-        sentinel.prev = sentinel.prev.prev;
-        return res;
+
+        return last.item;
     }
 
     public T get(int index) {
-        int count = 0;
-        TNode ptr = sentinel;
-        while (ptr.next != sentinel) {
-            ptr = ptr.next;
-            if (count == index) {
-                return ptr.item;
-            }
-            count++;
+        if (index + 1 > size) {
+            System.out.println("index out of bound");
+            return null;
         }
-        return null;
-    }
-
-    public T getRecursiveHelper(int index, int count, TNode ptr) {
-        if (index == count) {
-            return ptr.item;
+        ListNode p = sentFront.next;
+        int i = 0;
+        while (p != sentBack && i < index) {
+            p = p.next;
+            i += 1;
         }
-        return getRecursiveHelper(index, count+1, ptr.next);
+        return p.item;
     }
 
     public T getRecursive(int index) {
-        if (index >= size || index < 0) {
-            return null;
-        }
-        int count = 0;
-        TNode ptr = sentinel.next;
-        return getRecursiveHelper(index, count, ptr);
+        return null;
     }
-
 }
